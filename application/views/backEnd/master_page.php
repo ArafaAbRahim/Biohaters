@@ -242,16 +242,30 @@
                             </ul>
                         </li>
 
-                        <li class="treeview <?php if ($activeMenu === "course_category") echo "active"; ?> ">
-                            <a href="<?php echo base_url('admin/course-category'); ?>">
-                                <i class="fa fa-object-group"></i> <span> Course Category </span>
+                        <li class="treeview <?php if ($activeMenu === "lecture_quiz_add" || $activeMenu === "lecture_quiz_list" || $activeMenu === "lecture_quiz_edit") echo "active"; ?> ">
+                            <a href="#">
+                                <i class="fa fa-file-text"></i> <span> Lecture Quiz </span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class=" <?php if ($activeMenu === "lecture_quiz_add") echo "active"; ?> "><a href="<?php echo base_url('admin/lecture-quiz/add'); ?>"><i class="fa fa-circle-o"></i> Lecture Quiz Add </a></li>
+                                <li class=" <?php if ($activeMenu === "lecture_quiz_list") echo "active"; ?> "><a href="<?php echo base_url('admin/lecture-quiz/list'); ?>"><i class="fa fa-circle-o"></i> Lecture Quiz List </a></li>
+                            </ul>
                         </li>
 
-                        <li class="treeview <?php if ($activeMenu === "course_sub_category") echo "active"; ?> ">
-                            <a href="<?php echo base_url('admin/course-sub-category'); ?>">
-                                <i class="fa fa-object-ungroup"></i> <span> Course Sub Category </span>
+                        <li class="treeview <?php if ($activeMenu === "course_category" || $activeMenu === "course_sub_category") echo "active"; ?> ">
+                            <a href="#">
+                                <i class="fa fa-object-group"></i> <span> Manage Category </span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php if ($activeMenu === "course_category") echo "active"; ?> "><a href="<?php echo base_url('admin/course-category'); ?>"> <i class="fa fa-circle-o"></i> <span> Course Category </span></a></li>
+                                <li class="<?php if ($activeMenu === "course_sub_category") echo "active"; ?> "><a href="<?php echo base_url('admin/course-sub-category'); ?>"><i class="fa fa-circle-o"></i> <span> Course Sub Category </span></a></li>
+                            </ul>
                         </li>
 
                         <li class="treeview <?php if ($activeMenu === "lecture_sections") echo "active"; ?> ">
@@ -287,7 +301,7 @@
 
                         <li class="treeview <?php if ($activeMenu === "purchase_course_add" || $activeMenu === "purchase_course_list" || $activeMenu === "purchase_course_edit") echo "active"; ?> ">
                             <a href="#">
-                                <i class="fa fa-credit-card-alt"></i> <span> Purchase Course </span>
+                                <i class="fa fa-money"></i> <span> Purchase Course </span>
                                 <span class="pull-right-container">
                                     <i class="fa fa-angle-left pull-right"></i>
                                 </span>
@@ -298,7 +312,31 @@
                             </ul>
                         </li>
 
-                        
+                        <li class="treeview <?php if ($activeMenu === "payment_method") echo "active"; ?> ">
+                            <a href="<?php echo base_url('admin/payment-method'); ?>">
+                                <i class="fa fa-credit-card-alt"></i> <span> Payment Method </span>
+                            </a>
+                        </li>
+
+                        <li class="treeview <?php if ($activeMenu === "common_pages_add" || $activeMenu === "common_pages_list" || $activeMenu === "common_pages_edit") echo "active"; ?> ">
+                            <a href="#">
+                                <i class="fa fa-file-text-o"></i> <span> Common Page </span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class=" <?php if ($activeMenu === "common_pages_add") echo "active"; ?> "><a href="<?php echo base_url('admin/common-pages/add'); ?>"><i class="fa fa-circle-o"></i> Common Page Add </a></li>
+                                <li class=" <?php if ($activeMenu === "common_pages_list") echo "active"; ?> "><a href="<?php echo base_url('admin/common-pages/list'); ?>"><i class="fa fa-circle-o"></i> Common Page List </a></li>
+                            </ul>
+                        </li>
+
+                        <li class="treeview <?php if ($activeMenu === "messenger") echo "active"; ?> ">
+                            <a href="<?php echo base_url('admin/messenger'); ?>">
+                                <i class="fa fa-comments"></i> <span> Messenger </span>
+                            </a>
+                        </li>
+
                         <li class="treeview <?php if ($activeMenu === "user_list" || $activeMenu === "add_user" || $activeMenu === "user_edit") echo "active"; ?> ">
                             <a href="#">
                                 <i class="fa fa-users"></i> <span> <?php echo $this->lang->line("manage_user"); ?> </span>
@@ -312,7 +350,7 @@
                             </ul>
                         </li>
 
-                        <li class="treeview <?php if ($activeMenu === "page_settings_add" || $activeMenu === "page_settings_list" || $activeMenu === "page_settings_edit") echo "active"; ?> ">
+                        <li class="treeview hidden <?php if ($activeMenu === "page_settings_add" || $activeMenu === "page_settings_list" || $activeMenu === "page_settings_edit") echo "active"; ?> ">
                             <a href="#">
                                 <i class="fa fa-cog"></i> <span> <?php echo $this->lang->line("page_settings"); ?> </span>
                                 <span class="pull-right-container">
@@ -325,7 +363,7 @@
                             </ul>
                         </li>
 
-                        <li class="treeview <?php if ($activeMenu === "testimonials_add" || $activeMenu === "testimonials_list" || $activeMenu === "testimonials_edit") echo "active"; ?> ">
+                        <li class="treeview hidden <?php if ($activeMenu === "testimonials_add" || $activeMenu === "testimonials_list" || $activeMenu === "testimonials_edit") echo "active"; ?> ">
                             <a href="#">
                                 <i class="fa fa-star"></i> <span> <?php echo $this->lang->line('manage_testimonial'); ?> </span>
                                 <span class="pull-right-container">
@@ -338,7 +376,7 @@
                             </ul>
                         </li>
 
-                        <li class="treeview <?php if ($activeMenu === "sms_send" || $activeMenu === "setting" || $activeMenu === "new_sms") echo "active"; ?> ">
+                        <li class="treeview hidden <?php if ($activeMenu === "sms_send" || $activeMenu === "setting" || $activeMenu === "new_sms") echo "active"; ?> ">
                             <a href="<?php echo base_url('admin/sms_send'); ?>">
                                 <i class="fa fa-envelope"></i> <span> <?php echo $this->lang->line("sms_send"); ?> </span>
                             </a>

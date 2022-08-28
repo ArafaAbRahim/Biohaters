@@ -452,7 +452,7 @@ class Admin extends CI_Controller {
                     
                     if(file_exists($old_photo)) unlink($old_photo);
 
-                    $this->image_size_fix($newphotoadd['photo'], 200, 200);
+                    //$this->image_size_fix($newphotoadd['photo'], 200, 200);
 
                     $this->db->where('id', $user_id)->update('user', $newphotoadd);
 
@@ -1567,6 +1567,127 @@ class Admin extends CI_Controller {
 
 		$this->load->view('backEnd/master_page',$data);        
 	}
+
+	public function lecture_quiz($param1 = 'add', $param2 = '', $param3 = '')
+	{
+		if ($param1 == 'add') {
+
+			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+				$lecture_quiz_data['course_id']        	= $this->input->post('course_id', true);				
+				$lecture_quiz_data['lecture_id'] 		= $this->input->post('lecture_id', true);
+				$lecture_quiz_data['quiz_question'] 	= $this->input->post('quiz_question', true);
+				$lecture_quiz_data['option_1'] 			= $this->input->post('option_1', true);
+				$lecture_quiz_data['option_2'] 			= $this->input->post('option_2', true);
+				$lecture_quiz_data['option_3'] 			= $this->input->post('option_3', true);
+				$lecture_quiz_data['option_4'] 			= $this->input->post('option_4', true);
+				$lecture_quiz_data['option_5'] 			= $this->input->post('option_5', true);	
+				$lecture_quiz_data['correct_options'] 	= $this->input->post('correct_options', true);	
+				$lecture_quiz_data['explanation'] 		= $this->input->post('explanation', true);				
+				$lecture_quiz_data['insert_time'] 		= date('Y-m-d H:i:s');
+				$lecture_quiz_data['insert_by'] 		= $_SESSION['userid'];
+
+				$add_course_lectures = $this->db->insert('tbl_lecture_quiz',$lecture_quiz_data);
+
+				if ($add_course_lectures) {
+
+					$this->session->set_flashdata('message','Lecture Quiz Added Successfully!');
+					redirect('admin/lecture_quiz/list','refresh');
+
+				} else {
+
+				   $this->session->set_flashdata('message','Lecture Quiz Add Failed!');
+					redirect('admin/lecture_quiz/list','refresh');
+				}
+			}
+
+			$data['course_data'] 	  		= $this->db->select('id, course_title')->get('tbl_courses')->result();			
+
+			$data['title']             = 'Lecture Quiz Add';
+			$data['activeMenu']        = 'lecture_quiz_add';
+			$data['page']              = 'backEnd/admin/lecture_quiz_add';
+			
+		} elseif ($param1 == 'list' ) {
+
+			$data['lecture_quiz_list'] = $this->AdminModel->get_lecture_quiz_data();
+
+			$data['title']        = 'Lecture Quiz List';
+			$data['activeMenu']   = 'lecture_quiz_list';			
+			$data['page']         = 'backEnd/admin/lecture_quiz_list';
+		   
+		} elseif ($param1 == 'edit' && $param2 > 0) {
+
+			$data['edit_info']   = $this->db->get_where('tbl_lecture_quiz',array('id'=>$param2));
+
+			if ($data['edit_info']->num_rows() > 0) {
+
+				$data['edit_info']    = $data['edit_info']->row();
+
+				if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+					$lecture_quiz_data['course_id']        	= $this->input->post('course_id', true);				
+					$lecture_quiz_data['lecture_id'] 		= $this->input->post('lecture_id', true);
+					$lecture_quiz_data['quiz_question'] 	= $this->input->post('quiz_question', true);
+					$lecture_quiz_data['option_1'] 			= $this->input->post('option_1', true);
+					$lecture_quiz_data['option_2'] 			= $this->input->post('option_2', true);
+					$lecture_quiz_data['option_3'] 			= $this->input->post('option_3', true);
+					$lecture_quiz_data['option_4'] 			= $this->input->post('option_4', true);
+					$lecture_quiz_data['option_5'] 			= $this->input->post('option_5', true);	
+					$lecture_quiz_data['correct_options'] 	= $this->input->post('correct_options', true);	
+					$lecture_quiz_data['explanation'] 		= $this->input->post('explanation', true);
+				
+					$update_lecture_quiz = $this->db->where('id',$param2)->update('tbl_lecture_quiz', $lecture_quiz_data);
+
+					if ($update_lecture_quiz) {
+
+						$this->session->set_flashdata('message','Lecture Quiz Updated Successfully!');
+						redirect('admin/lecture_quiz/list','refresh');
+
+					} else {
+
+					   $this->session->set_flashdata('message','Lecture Quiz Update Failed!');
+						redirect('admin/lecture_quiz/list','refresh');
+					}
+				}
+
+			} else {
+
+				$this->session->set_flashdata('message','Wrong Attempt!');
+				redirect('admin/lecture_quiz/list','refresh');
+			}
+
+			$data['course_data'] 	  		= $this->db->select('id, course_title')->get('tbl_courses')->result();			
+			$data['course_lecture_data'] 	= $this->db->select('id, title')->get('tbl_course_lecture')->result();
+
+			$data['title']      = 'Lecture Quiz Edit';
+			$data['activeMenu'] = 'lecture_quiz_edit';
+			$data['page']       = 'backEnd/admin/lecture_quiz_edit';
+			
+		   
+		} elseif($param1 == 'delete' && $param2 > 0) {
+
+			$delete_lecture_quiz = $this->db->where('id',$param2)->delete('tbl_lecture_quiz');
+			
+		   if ($delete_lecture_quiz) {
+
+				$this->session->set_flashdata('message','Lecture Quiz  Deleted Successfully!');
+				redirect('admin/lecture_quiz/list','refresh');
+
+			} else {
+
+			   $this->session->set_flashdata('message','Lecture Quiz Deleted Failed!');
+				redirect('admin/lecture_quiz/list','refresh');
+			}
+			
+		} else {
+
+			$this->session->set_flashdata('message', 'Wrong Attempt!');
+			redirect('admin/lecture_quiz/list','refresh');
+
+		}
+
+		$this->load->view('backEnd/master_page',$data);        
+	}
 	
 	public function lecture_sections ($param1 = 'add', $param2 = '', $param3 = '') 
 	{
@@ -1812,9 +1933,9 @@ class Admin extends CI_Controller {
 		echo json_encode($result, JSON_UNESCAPED_UNICODE);
 	}
 
-	public function get_course_amount( $course_id = 1) {
+	public function get_course_amount($course_id = 1) {
 
-		$result = $this->db->select('course_price')->where('id', $course_id)->get('tbl_courses')->result();
+		$result = $this->db->select('id, course_price, course_discount')->where('id', $course_id)->get('tbl_courses')->result();
 		echo json_encode($result, JSON_UNESCAPED_UNICODE);
 	}
 
@@ -1954,5 +2075,302 @@ class Admin extends CI_Controller {
 
 		$this->load->view('backEnd/master_page',$data);        
 	}
+	
+	public function payment_method($param1 = 'add', $param2 = '', $param3 = '')
+	{
+		if ($param1 == 'add') {
+
+		   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+			   	$payment_method_data['name']   				= $this->input->post('name', true);
+				$payment_method_data['priority']   			= $this->input->post('priority', true);
+				$payment_method_data['input_field_format']  = "";
+
+				foreach($this->input->post('input_field_format',true) as $key => $single_field) {
+					if(strlen($single_field) > 1) {
+						if($key > 0) $payment_method_data['input_field_format'] .=  "**";
+						$payment_method_data['input_field_format'] .= $single_field;
+					}
+				}
+			  
+			   
+			   	$add_payment_method = $this->db->insert('tbl_payment_method',$payment_method_data);
+
+			   if ($add_payment_method) {
+
+					$this->session->set_flashdata('message','Payment Method Added Successfully!');
+					redirect('admin/payment_method','refresh');
+
+			   } else {
+
+					$this->session->set_flashdata('message','Payment Method Add Failed!');
+					redirect('admin/payment_method','refresh');
+			   }
+			   
+		   }
+		}elseif ($param1 == 'edit' && $param2 > 0) {
+
+			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+				$payment_method_data['name']   				= $this->input->post('name', true);
+				$payment_method_data['priority']   			= $this->input->post('priority', true);
+				$payment_method_data['input_field_format']  = "";
+
+				foreach($this->input->post('input_field_format',true) as $key => $single_field) {
+					if(strlen($single_field) > 1) {
+						if($key > 0) $payment_method_data['input_field_format'] .=  "**";
+						$payment_method_data['input_field_format'] .= $single_field;
+					}
+				}			
+
+				$update_payment_method = $this->db->where('id',$param2)->update('tbl_payment_method',$payment_method_data);
+
+			    	if ($update_payment_method) {
+
+					$this->session->set_flashdata('message','Payment Method Updated Successfully!');
+					redirect('admin/payment_method','refresh');
+
+			    	} else {
+
+				   $this->session->set_flashdata('message','Payment Method Update Failed!');
+					redirect('admin/payment_method','refresh');
+				}
+			}
+
+			$data['edit_info'] = $this->db->get_where('tbl_payment_method',array('id'=>$param2));
+
+			if ($data['edit_info']->num_rows() > 0) {
+
+				$data['edit_info']    = $data['edit_info']->row();
+
+			} else {
+
+				$this->session->set_flashdata('message','Wrong Attempt!');
+				redirect('admin/payment_method','refresh');
+			}
+		
+		   
+		}elseif ($param1 == 'delete' && $param2 > 0) {
+
+			$delete_payment_method = $this->db->where('id',$param2)->delete('tbl_payment_method');
+
+			if ($delete_payment_method) {
+
+				$this->session->set_flashdata('message','Payment Method Deleted Successfully!');
+				redirect('admin/payment_method','refresh');
+
+		   } else {
+
+			   $this->session->set_flashdata('message','Payment Method Delete Failed!');
+				redirect('admin/payment_method','refresh');
+		   }
+		}
+
+		$data['payment_method_list']    = $this->db->order_by('priority','asc')->get('tbl_payment_method')->result();
+
+		$data['title']      = 'Payment Method';
+		$data['activeMenu'] = 'payment_method';
+		$data['page']       = 'backEnd/admin/payment_method';
+		
+		$this->load->view('backEnd/master_page',$data);
+	}
+
+	public function common_pages($param1 = 'add', $param2 = '', $param3 = '')
+	{
+		if ($param1 == 'add') {
+
+			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+				$insert_common_pages['title']        	= $this->input->post('title', true);
+				$insert_common_pages['body']    		= $this->input->post('body', true);
+				$insert_common_pages['insert_by']   	= $_SESSION['userid'];
+				$insert_common_pages['insert_time'] 	= date('Y-m-d H:i:s');
+
+				if (!empty($_FILES['photo']['name'])) {
+
+					$path_parts                 = pathinfo($_FILES["photo"]['name']);
+					$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
+					$dir                        = date("YmdHis", time());
+					$config_c['file_name']      = $newfile_name . '_' . $dir;
+					$config_c['remove_spaces']  = TRUE;
+					$config_c['upload_path']    = 'assets/commonPagePhoto/';
+					$config_c['max_size']       = '20000'; //  less than 20 MB
+					$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
+
+					$this->load->library('upload', $config_c);
+					$this->upload->initialize($config_c);
+					if (!$this->upload->do_upload('photo')) {
+
+					} else {
+
+						$upload_c = $this->upload->data();
+						$insert_common_pages['photo'] = $config_c['upload_path'] . $upload_c['file_name'];						
+					}
+					
+				}
+
+				$add_common_pages = $this->db->insert('tbl_common_pages',$insert_common_pages);
+
+				if ($add_common_pages) {
+
+					$this->session->set_flashdata('message','Common Page Added Successfully!');
+					redirect('admin/common_pages/list','refresh');
+
+				} else {
+
+				   $this->session->set_flashdata('message','Common Page Add Failed!');
+					redirect('admin/common_pages/list','refresh');
+				}
+			}
+
+			$data['title']             = 'Common Page Add';
+			$data['activeMenu']        = 'common_pages_add';
+			$data['page']              = 'backEnd/admin/common_pages_add';
+			
+		} elseif ($param1 == 'list' ) {
+
+			$data['common_pages'] = $this->db->get('tbl_common_pages')->result(); 
+
+			$data['title']        = 'Common Page List';
+			$data['activeMenu']   = 'common_pages_list';			
+			$data['page']         = 'backEnd/admin/common_pages_list';
+		   
+		} elseif ($param1 == 'edit' && $param2 > 0) {
+
+			$data['edit_info']   = $this->db->get_where('tbl_common_pages',array('id'=>$param2));
+
+			if ($data['edit_info']->num_rows() > 0) {
+
+				$data['edit_info']    = $data['edit_info']->row();
+
+				if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+					$update_common_pages['title']   = $this->input->post('title', true);
+					$update_common_pages['body']    = $this->input->post('body', true);		
+
+					if (!empty($_FILES['photo']['name'])) {
+
+						$path_parts                 = pathinfo($_FILES["photo"]['name']);
+						$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
+						$dir                        = date("YmdHis", time());
+						$config_c['file_name']      = $newfile_name . '_' . $dir;
+						$config_c['remove_spaces']  = TRUE;
+						$config_c['upload_path']    = 'assets/commonPagePhoto/';
+						$config_c['max_size']       = '20000'; //  less than 20 MB
+						$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
+
+						$this->load->library('upload', $config_c);
+						$this->upload->initialize($config_c);
+						if (!$this->upload->do_upload('photo')) {
+
+						} else {
+
+							$upload_c = $this->upload->data();
+							$update_common_pages['photo'] = $config_c['upload_path'] . $upload_c['file_name'];
+							//$this->image_size_fix($update_common_pagess['photo'], 400, 400);
+						}
+						
+					}
+
+					if ($this->AdminModel->update_common_pagess($update_common_pages, $param2)) {
+
+						$this->session->set_flashdata('message','Common Page  Updated Successfully!');
+						redirect('admin/common_pages/list','refresh');
+
+					} else {
+
+					   $this->session->set_flashdata('message','Common Page Update Failed!');
+						redirect('admin/common_pages/list','refresh');
+					}
+				}
+
+			} else {
+
+				$this->session->set_flashdata('message','Wrong Attempt!');
+				redirect('admin/common_pages/list','refresh');
+			}
+
+			$data['title']      = 'Common Page Edit';
+			$data['activeMenu'] = 'common_pages_edit';
+			$data['page']       = 'backEnd/admin/common_pages_edit';
+			
+		   
+		} elseif($param1 == 'delete' && $param2 > 0) {
+			
+		   if ($this->AdminModel->delete_common_pages($param2)) {
+
+				$this->session->set_flashdata('message','Common Page  Deleted Successfully!');
+				redirect('admin/common_pages/list','refresh');
+
+			} else {
+
+			   $this->session->set_flashdata('message','Common Page Deleted Failed!');
+				redirect('admin/common_pages/list','refresh');
+			}
+			
+		} else {
+
+			$this->session->set_flashdata('message', 'Wrong Attempt!');
+			redirect('admin/common_pages/list','refresh');
+
+		}
+
+		$this->load->view('backEnd/master_page',$data);        
+	}
+
+	public function messenger($param1 = 'add', $param2 = '', $param3 = '')
+	{
+		if ($param1 == 'add') {
+
+		   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+			   	$messenger_data['student_id']   	= $this->input->post('student_id', true);
+				$messenger_data['message_text']   	= $this->input->post('message_text', true);
+				$messenger_data['office_message']   = $this->input->post('office_message', true);
+			   	$messenger_data['replay_user_id']   = $_SESSION['userid'];
+				$messenger_data['message_time'] 	= date('Y-m-d H:i:s');
+			   
+			   	$add_messenger = $this->db->insert('tbl_messenger',$messenger_data);
+
+			   if ($add_messenger) {
+
+					$this->session->set_flashdata('message','Messenger Added Successfully!');
+					redirect('admin/messenger','refresh');
+
+			   } else {
+
+					$this->session->set_flashdata('message','Messenger Add Failed!');
+					redirect('admin/messenger','refresh');
+			   }
+			   
+		   }
+
+		}
+
+		$data['student_list']    = $this->db->select('id, student_name, student_photo, student_roll')->where('verified', 1)->order_by('id','asc')->limit(10)->get('tbl_student')->result();
+
+		$student_id    = $this->db->get('tbl_student')->row()->id;
+		$data['messenger_list']    = $this->db->where('student_id', $student_id)->order_by('message_time','desc')->get('tbl_messenger')->result();
+
+		$data['title']      = 'messenger';
+		$data['activeMenu'] = 'messenger';
+		$data['page']       = 'backEnd/admin/messenger';
+		
+		$this->load->view('backEnd/master_page',$data);
+	}
+
+	public function get_student_wise_message_list()
+    {
+        $data = array();  
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            $student_id = $this->input->post('student_id', true);
+			$data['student_id'] = $student_id;
+            $data['message_list'] = $this->AdminModel->get_messages_student_wise($student_id);
+            $this->load->view('backend/admin/get_student_wise_message_list', $data);
+        }
+
+    }
 
 }

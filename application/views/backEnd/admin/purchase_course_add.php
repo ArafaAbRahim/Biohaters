@@ -35,6 +35,7 @@
                      <div class="col-md-12">
                         <div class="form-group">
                            <div class="col-md-12">
+                              <br>
                               <table class="table table-bordered table-striped table_th_primary" style="width: 100%;">
                                  <thead>
                                     <tr>
@@ -75,60 +76,55 @@
                                                 </select>
                                           </td>
                                           <td>
-                                             <input type="number"  class="form-control inner_shadow_primary numberconvert" name="course_fee[]" value="0" id="course_fee<?= $i; ?>"  placeholder="Price" readonly>
+                                             <input type="number"  class="form-control inner_shadow_primary numberconvert"  value="0" id="course_fee<?= $i; ?>"  placeholder="Price" readonly>
                                           </td>
                                           <td>
-                                             <input type="number" class="form-control inner_shadow_primary numberconvert" name="amount[]" value="0" id="amount<?= $i; ?>"  placeholder="<?php echo $this->lang->line('amount'); ?>" readonly>
+                                             <input type="number" class="form-control inner_shadow_primary numberconvert" name="discount[]" value="0" id="discount<?= $i; ?>"  placeholder="<?php echo $this->lang->line('amount'); ?>" readonly>
                                           </td>
                                           <td>
-                                             <input type="number" class="form-control inner_shadow_primary numberconvert" name="amount[]" value="0" id="amount<?= $i; ?>"  placeholder="<?php echo $this->lang->line('amount'); ?>" readonly>
+                                             <input type="number" class="form-control inner_shadow_primary numberconvert" name="total_bill[]" value="0" id="amount<?= $i; ?>"  placeholder="<?php echo $this->lang->line('amount'); ?>" readonly>
                                           </td>
                                           
                                        </tr>
                                     <?php } ?>
 
                                     <tr>
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('sub_total') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Sub Total: </td>
                                        <td>
                                           <input type="text" readonly id="total_amount_id" name="total_amount_id" class="form-control inner_shadow_primary" value="0">
                                        </td>
                                     </tr>
 
                                     <tr>
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('discount') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Discount: </td>
                                        <td>
                                           <input type="checkbox" id="discount_check" class="pull-right">
                                        </td>
                                     </tr>
 
                                     <tr id="discount_tr" style="display: none;">
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('discount_amount') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Discount Amount: </td>
                                        <td>
                                           <input type="text" name="discount_amount"  id="discount_amount" class="form-control inner_shadow_primary" onkeyup="discount_cal()" autocomplete="off">
                                        </td>
                                     </tr>
 
                                     <tr id="permit_tr" style="display: none;">
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('permit_by') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Discount By: </td>
                                        <td>
                                           <input type="text" id="permit_by" name="discount_permit_by" class="form-control inner_shadow_primary">
                                        </td>
                                     </tr>
 
                                     <tr id="discount_option" style="display: none;">
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('discount_option') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Details: </td>
                                        <td>
-                                          <select class="form-control inner_shadow_primary select2" name="discount_option_id" id="discount_option_id" style="width: 100%;">
-                                             <option value=""><?php echo $this->lang->line('select_discount_option'); ?></option>
-                                             <?php foreach($discount_option_list as $list){?>
-                                                <option value="<?php echo $list->id;?>"><?php echo $list->option_name; ?></option>
-                                             <?php }?>
-                                       </select>                                      
+                                          <input type="text" id="permit_by" name="discount_permit_by" class="form-control inner_shadow_primary">                              
                                        </td>
                                     </tr>
                                     
                                     <tr>
-                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;"><?php echo $this->lang->line('payable') ?>: </td>
+                                       <td colspan="6" style="text-align: right; font-size: 18px; font-weight: bold;">Total Payable: </td>
                                        <td>
                                           <input type="text" id="payable" name="total_amount" class="form-control inner_shadow_primary" readonly="">
                                        </td>
@@ -162,7 +158,7 @@
                 var data = JSON.parse(data2);
                 
                 $('#course_fee'+keyid).val(data.course_price);
-                $('#amount'+keyid).val(data.price);
+                $('#discount'+keyid).val(data.course_discount);
 
                 var total_amount = 0;
     
@@ -234,73 +230,6 @@
 
 </script>
 
-
-<script type="text/javascript">
-
-   $(document).ready(function() {
-      
-      $("#patient_id").keyup(function() {
-         
-         var search = $('#patient_id').val();
-         
-         if (search == "") {
-            
-            $("#display").html("");
-         }
-         
-         else {
-            
-            $.ajax({
-                  type: "POST",
-                  url: "<?php echo base_url() . 'admin/patient-search'; ?>",
-                  data: {search: search },
-                  success: function(res) {
-                     var obj = JSON.parse(res);
-                     console.log(obj);
-                     var data = [];
-                     
-                     if(obj.length > 0){
-                           $.each(obj, function (i, item) {
-                              data.push({label:(this.patient_name + "(" + this.patient_phone + ")"), idx:this.id, pname:this.patient_name, phone:this.patient_phone,fname:this.father_name, mname:this.mother_name, nid:this.patient_nid, bdate:this.birth_date, addr:this.address, gen:this.gender}); 
-                           
-                           });
-                           $( "#patient_id").autocomplete({ 
-                     
-                              source: data,
-
-                              select: function(event, ui) {
-                                 //hidden input
-                                 $('#hiddenid').val(ui.item.idx);
-                                 $('#patient_name').val(ui.item.pname);
-                                 $('#patient_phone').val(ui.item.phone);
-                                 $('#father_name').val(ui.item.fname);
-                                 $('#mother_name').val(ui.item.mname);
-                                 $('#patient_nid').val(ui.item.nid);
-                                 $('#birth_date').val(ui.item.bdate);
-                                 $('#address').val(ui.item.addr);
-                                 $("#gender").find('option').remove().end();
-                                 $("#gender").append($('<option>', {
-      
-                                    value: ui.item.gen,
-         
-                                    text: ui.item.gen,
-               
-                                 }));
-                                 
-
-                              }
-                           });
-                           
-                     } else{
-      
-                     }     
-                  }
-            });
-         }
-      });
-   });
-
-</script>
 
 <script>
     $(document).ready(function () {

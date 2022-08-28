@@ -74,8 +74,14 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <div class="col-sm-12">
-                                            <label>Video Server</label>
-                                            <input name="video_server" placeholder="Video Server" class="form-control inner_shadow_teal" type="text">
+                                            <label>Video Server</label>                                            
+                                            <select name="video_server" class=" form-control">
+                                                <option value="" selected disabled> Select Server </option>
+                                                <option value="server"> Server </option>
+                                                <option value="youtube"> Youtube</option>
+                                                <option value="vimeo"> Vimeo </option>
+                                                <option value="dailymotion"> Dailymotion </option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

@@ -318,6 +318,83 @@ class AdminModel extends CI_Model
 			return array();
 		}
 	}
+
+	public function update_common_pages($update_common_pages, $param2)
+	{
+		if (isset($update_common_pages['photo']) && file_exists($update_common_pages['photo'])) {
+
+			$result = $this->db->select('photo')
+				->from('tbl_common_pages')
+				->where('id', $param2)
+				->get()
+				->row()->photo;
+
+			if (file_exists($result)) {
+				unlink($result);
+			}
+		}
+
+		return $this->db->where('id', $param2)->update('tbl_common_pages', $update_common_pages);
+	}
+
+	public function delete_common_pages($param2)
+	{
+		$result = $this->db->select('photo')
+			->from('tbl_common_pages')
+			->where('id', $param2)
+			->get()
+			->row()->photo;
+
+		if (file_exists($result)) {
+			unlink($result);
+		}
+
+		return $this->db->where('id', $param2)->delete('tbl_common_pages');
+	}
+
+	public function get_lecture_quiz_data()
+	{
+		$this->db->select('tbl_lecture_quiz.*, tbl_courses.course_title, tbl_course_lecture.title')
+			->from('tbl_lecture_quiz')			
+			->join('tbl_courses', 'tbl_courses.id = tbl_lecture_quiz.course_id', 'left')
+			->join('tbl_course_lecture', 'tbl_course_lecture.id = tbl_lecture_quiz.lecture_id', 'left')
+			->order_by('tbl_lecture_quiz.id', 'desc');
+
+		$result = $this->db->get();
+
+		if ($result->num_rows() > 0) {
+
+			return $result->result();
+		} else {
+
+			return array();
+		}
+	}
+
+	public function get_messages_student_wise($student_id = 0)
+	{
+		$this->db->select('tbl_messenger.*, tbl_student.student_name, user.firstname, user.lastname')
+			->from('tbl_messenger')
+			->join('tbl_student','tbl_messenger.student_id = tbl_student.id','left')
+			->join('user','tbl_messenger.replay_user_id = user.id','left')			
+			->order_by('tbl_messenger.message_time', 'asc');
+			
+		$this->db->where('student_id', $student_id);
+											
+		$result = $this->db->get();
+
+		if($result->num_rows() > 0){
+
+			return $result->result();
+
+		} else {
+
+			return array();
+		}	
+
+		
+	}
+
 }
 
 ?>

@@ -75,7 +75,13 @@
                                     <div class="form-group">
                                         <div class="col-sm-12">
                                             <label>Video Server</label>
-                                            <input name="video_server" value="<?= $edit_info->video_server; ?>" placeholder="Video Server" class="form-control inner_shadow_teal" type="text">
+                                            <select name="video_server" class=" form-control">
+                                                <option value="" selected disabled> Select Server </option>
+                                                <option value="server" <?php if ($edit_info->video_server == 'server') echo 'selected'; ?>> Server </option>
+                                                <option value="youtube" <?php if ($edit_info->video_server == 'youtube') echo 'selected'; ?>> Youtube</option>
+                                                <option value="vimeo" <?php if ($edit_info->video_server == 'vimeo') echo 'selected'; ?>> Vimeo </option>
+                                                <option value="dailymotion" <?php if ($edit_info->video_server == 'dailymotion') echo 'selected'; ?>> Dailymotion </option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
