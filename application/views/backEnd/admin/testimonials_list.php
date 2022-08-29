@@ -16,11 +16,10 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;"><?php echo $this->lang->line('sl'); ?></th>
-                                <th style="width: 15%;"><?php echo $this->lang->line('name'); ?></th>
-                                <th style="width: 15%;"><?php echo $this->lang->line('position'); ?></th>
+                                <th style="width: 20%;">Student</th>
+                                <th style="width: 20%;"><?php echo $this->lang->line('name'); ?></th>                                
                                 <th style="width: 10%;"><?php echo $this->lang->line('priority'); ?></th>
-                                <th style="width: 25%;"><?php echo $this->lang->line('description'); ?></th>
-                                <th style="width: 10%;"><?php echo $this->lang->line('image'); ?></th>
+                                <th style="width: 35%;">Feedback</th>                                
                                 <th style="width: 10%;"><?php echo $this->lang->line('action'); ?></th>
                             </tr>
                         </thead>
@@ -30,14 +29,11 @@
                                 foreach ($testimonials as $value) {
                                 	?>
                             <tr>
-                                <td> <?php echo $sl++ ; ?> </td>
-                                <td> <?php echo $value->name; ?> </td>
-                                <td> <?php echo $value->position; ?> </td>
-                                <td> <?php echo $value->priority; ?> </td>
-                                <td> <?php echo character_limiter(strip_tags($value->description), 150); ?> </td>
-                                <td>
-                                    <img src="<?php echo base_url($value->photo) ?>" alt="" width="50px" height="50px">
-                                </td>
+                                <td> <?= $sl++ ; ?> </td>
+                                <td> <?= $value->student_name; ?> <br> Roll: <?= $value->student_roll; ?> </td>
+                                <td> <?= $value->name; ?> </td>                                
+                                <td> <?= $value->priority; ?> </td>
+                                <td> <?php echo character_limiter(strip_tags($value->feedback), 150); ?> </td>                               
                                 <td> 
                                     <a href="<?php echo base_url('admin/testimonial/edit/'.$value->id); ?>" class="btn btn-sm bg-teal"><i class="fa fa-edit"></i></a>
                                     <a href="<?php echo base_url('admin/testimonial/delete/'.$value->id); ?>" class="btn btn-sm btn-danger" onclick = 'return confirm("Are You Sure?")'><i class="fa fa-trash"></i></a>

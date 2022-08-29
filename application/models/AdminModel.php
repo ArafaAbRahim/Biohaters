@@ -153,39 +153,6 @@ class AdminModel extends CI_Model
 		return $this->db->where('id', $user_id)->update('user', $update_data);
 	}
 
-	public function update_testimonials($update_testimonials, $param2)
-	{
-		if (isset($update_testimonials['photo']) && file_exists($update_testimonials['photo'])) {
-
-			$result = $this->db->select('photo')
-				->from('tbl_testimonial')
-				->where('id', $param2)
-				->get()
-				->row()->photo;
-
-			if (file_exists($result)) {
-				unlink($result);
-			}
-		}
-
-		return $this->db->where('id', $param2)->update('tbl_testimonial', $update_testimonials);
-	}
-
-	public function delete_testimonials($param2)
-	{
-		$result = $this->db->select('photo')
-			->from('tbl_testimonial')
-			->where('id', $param2)
-			->get()
-			->row()->photo;
-
-		if (file_exists($result)) {
-			unlink($result);
-		}
-
-		return $this->db->where('id', $param2)->delete('tbl_testimonial');
-	}
-
 	public function theme_text_update($name_index, $value)
 	{
 
@@ -352,6 +319,39 @@ class AdminModel extends CI_Model
 		return $this->db->where('id', $param2)->delete('tbl_common_pages');
 	}
 
+	public function update_shortcuts($update_shortcut, $param2)
+	{
+		if (isset($update_shortcut['icon']) && file_exists($update_shortcut['icon'])) {
+
+			$result = $this->db->select('icon')
+				->from('tbl_shortcuts')
+				->where('id', $param2)
+				->get()
+				->row()->icon;
+
+			if (file_exists($result)) {
+				unlink($result);
+			}
+		}
+
+		return $this->db->where('id', $param2)->update('tbl_shortcuts', $update_shortcut);
+	}
+
+	public function delete_shortcut($param2)
+	{
+		$result = $this->db->select('icon')
+			->from('tbl_shortcuts')
+			->where('id', $param2)
+			->get()
+			->row()->icon;
+
+		if (file_exists($result)) {
+			unlink($result);
+		}
+
+		return $this->db->where('id', $param2)->delete('tbl_shortcuts');
+	}
+
 	public function get_lecture_quiz_data()
 	{
 		$this->db->select('tbl_lecture_quiz.*, tbl_courses.course_title, tbl_course_lecture.title')
@@ -395,7 +395,25 @@ class AdminModel extends CI_Model
 		
 	}
 
-}
+	public function get_testimonial_data()
+	{
+			$this->db->select('tbl_testimonial.*, tbl_student.student_name, tbl_student.student_roll')
+				->from('tbl_testimonial')			
+				->join('tbl_student', 'tbl_student.id = tbl_testimonial.student_id', 'left')			
+				->order_by('tbl_testimonial.priority', 'desc');
+
+			$result = $this->db->get();
+
+			if ($result->num_rows() > 0) {
+
+				return $result->result();
+			} else {
+
+				return array();
+			}
+		}
+
+	}
 
 ?>
 

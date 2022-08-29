@@ -564,36 +564,14 @@ class Admin extends CI_Controller {
 
 			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-				$insert_testimonials['name']        = $this->input->post('name', true);
-				$insert_testimonials['position']    = $this->input->post('position', true);
-				$insert_testimonials['priority']    = $this->input->post('priority', true);
-				$insert_testimonials['description'] = $this->input->post('description', true);
-				$insert_testimonials['insert_by']   = $_SESSION['userid'];
-				$insert_testimonials['insert_time'] = date('Y-m-d H:i:s');
+				$insert_testimonials['student_id']     	= $this->input->post('student_id', true);
+				$insert_testimonials['name']        	= $this->input->post('name', true);
+				$insert_testimonials['feedback']    	= $this->input->post('feedback', true);
+				$insert_testimonials['priority']    	= $this->input->post('priority', true);
+				$insert_testimonials['is_active'] 		= $this->input->post('is_active', true);
+				$insert_testimonials['insert_by']   	= $_SESSION['userid'];
+				$insert_testimonials['insert_time'] 	= date('Y-m-d H:i:s');
 
-				if (!empty($_FILES['photo']['name'])) {
-
-					$path_parts                 = pathinfo($_FILES["photo"]['name']);
-					$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
-					$dir                        = date("YmdHis", time());
-					$config_c['file_name']      = $newfile_name . '_' . $dir;
-					$config_c['remove_spaces']  = TRUE;
-					$config_c['upload_path']    = 'assets/testimonialsPhoto/';
-					$config_c['max_size']       = '20000'; //  less than 20 MB
-					$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
-
-					$this->load->library('upload', $config_c);
-					$this->upload->initialize($config_c);
-					if (!$this->upload->do_upload('photo')) {
-
-					} else {
-
-						$upload_c = $this->upload->data();
-						$insert_testimonials['photo'] = $config_c['upload_path'] . $upload_c['file_name'];
-						$this->image_size_fix($insert_testimonials['photo'], 400, 400);
-					}
-					
-				}
 
 				$add_testimonials = $this->db->insert('tbl_testimonial',$insert_testimonials);
 
@@ -609,15 +587,18 @@ class Admin extends CI_Controller {
 				}
 			}
 
+			$data['student_list']    = $this->db->select('id, student_name, student_roll')->where('verified', 1)->order_by('id','asc')->get('tbl_student')->result();
+
 			$data['title']             = 'Testimonials Add';
 			$data['activeMenu']        = 'testimonials_add';
 			$data['page']              = 'backEnd/admin/testimonials_add';
 			
 		} elseif ($param1 == 'list' ) {
 
+			$data['testimonials'] = $this->AdminModel->get_testimonial_data();
+
 			$data['title']        = 'Testimonials List';
-			$data['activeMenu']   = 'testimonials_list';
-			$data['testimonials'] = $this->db->get('tbl_testimonial')->result(); 
+			$data['activeMenu']   = 'testimonials_list';			
 			$data['page']         = 'backEnd/admin/testimonials_list';
 		   
 		} elseif ($param1 == 'edit' && $param2 > 0) {
@@ -630,36 +611,15 @@ class Admin extends CI_Controller {
 
 				if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-					$update_testimonials['name']        = $this->input->post('name', true);
-					$update_testimonials['position']    = $this->input->post('position', true);
-					$update_testimonials['priority']    = $this->input->post('priority', true);
-					$update_testimonials['description'] = $this->input->post('description', true);
+					$update_testimonials['student_id']     	= $this->input->post('student_id', true);
+					$update_testimonials['name']        	= $this->input->post('name', true);
+					$update_testimonials['feedback']    	= $this->input->post('feedback', true);
+					$update_testimonials['priority']    	= $this->input->post('priority', true);
+					$update_testimonials['is_active'] 		= $this->input->post('is_active', true);
 
-					if (!empty($_FILES['photo']['name'])) {
+					$update_testimonial = $this->db->where('id', $param2)->update('tbl_testimonial',$update_testimonials);
 
-						$path_parts                 = pathinfo($_FILES["photo"]['name']);
-						$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
-						$dir                        = date("YmdHis", time());
-						$config_c['file_name']      = $newfile_name . '_' . $dir;
-						$config_c['remove_spaces']  = TRUE;
-						$config_c['upload_path']    = 'assets/testimonialsPhoto/';
-						$config_c['max_size']       = '20000'; //  less than 20 MB
-						$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
-
-						$this->load->library('upload', $config_c);
-						$this->upload->initialize($config_c);
-						if (!$this->upload->do_upload('photo')) {
-
-						} else {
-
-							$upload_c = $this->upload->data();
-							$update_testimonials['photo'] = $config_c['upload_path'] . $upload_c['file_name'];
-							$this->image_size_fix($update_testimonials['photo'], 400, 400);
-						}
-						
-					}
-
-					if ($this->AdminModel->update_testimonials($update_testimonials, $param2)) {
+					if ($update_testimonial) {
 
 						$this->session->set_flashdata('message','Testimonials  Updated Successfully!');
 						redirect('admin/testimonial/list','refresh');
@@ -677,14 +637,18 @@ class Admin extends CI_Controller {
 				redirect('admin/testimonial/list','refresh');
 			}
 
+			$data['student_list']    = $this->db->select('id, student_name, student_roll')->where('verified', 1)->order_by('id','asc')->get('tbl_student')->result();
+
 			$data['title']      = 'Testimonials Edit';
 			$data['activeMenu'] = 'testimonials_edit';
 			$data['page']       = 'backEnd/admin/testimonials_edit';
 			
 		   
 		} elseif($param1 == 'delete' && $param2 > 0) {
+
+			$delete_testimonial = $this->db->where('id', $param2)->delete('tbl_testimonial');
 			
-		   if ($this->AdminModel->delete_testimonials($param2)) {
+		   if ($delete_testimonial) {
 
 				$this->session->set_flashdata('message','Testimonials  Deleted Successfully!');
 				redirect('admin/testimonial/list','refresh');
@@ -1935,7 +1899,13 @@ class Admin extends CI_Controller {
 
 	public function get_course_amount($course_id = 1) {
 
-		$result = $this->db->select('id, course_price, course_discount')->where('id', $course_id)->get('tbl_courses')->result();
+		$result = $this->db->select('id, course_price, course_discount')->where('id', $course_id)->get('tbl_courses')->row();
+		echo json_encode($result, JSON_UNESCAPED_UNICODE);
+	}
+
+	public function get_lecture_amount($lecture_id = 1) {
+
+		$result = $this->db->select('id, lecture_price, lecture_discount')->where('id', $lecture_id)->get('tbl_course_lecture')->row();
 		echo json_encode($result, JSON_UNESCAPED_UNICODE);
 	}
 
@@ -2312,6 +2282,149 @@ class Admin extends CI_Controller {
 
 			$this->session->set_flashdata('message', 'Wrong Attempt!');
 			redirect('admin/common_pages/list','refresh');
+
+		}
+
+		$this->load->view('backEnd/master_page',$data);        
+	}
+
+	public function shortcut($param1 = 'add', $param2 = '', $param3 = '')
+	{
+		if ($param1 == 'add') {
+
+			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+				$insert_shortcut['title']        	= $this->input->post('title', true);
+				$insert_shortcut['value']    		= $this->input->post('value', true);
+				$insert_shortcut['insert_by']   	= $_SESSION['userid'];
+				$insert_shortcut['insert_time'] 	= date('Y-m-d H:i:s');
+
+				if (!empty($_FILES['icon']['name'])) {
+
+					$path_parts                 = pathinfo($_FILES["icon"]['name']);
+					$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
+					$dir                        = date("YmdHis", time());
+					$config_c['file_name']      = $newfile_name . '_' . $dir;
+					$config_c['remove_spaces']  = TRUE;
+					$config_c['upload_path']    = 'assets/shortcutPhoto/';
+					$config_c['max_size']       = '20000'; //  less than 20 MB
+					$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
+
+					$this->load->library('upload', $config_c);
+					$this->upload->initialize($config_c);
+					if (!$this->upload->do_upload('icon')) {
+
+					} else {
+
+						$upload_c = $this->upload->data();
+						$insert_shortcut['icon'] = $config_c['upload_path'] . $upload_c['file_name'];						
+					}
+					
+				}
+
+				$add_shortcut = $this->db->insert('tbl_shortcuts',$insert_shortcut);
+
+				if ($add_shortcut) {
+
+					$this->session->set_flashdata('message','Shortcut Added Successfully!');
+					redirect('admin/shortcut/list','refresh');
+
+				} else {
+
+				   $this->session->set_flashdata('message','Shortcut Add Failed!');
+					redirect('admin/shortcut/list','refresh');
+				}
+			}
+
+			$data['title']             = 'Shortcut Add';
+			$data['activeMenu']        = 'shortcut_add';
+			$data['page']              = 'backEnd/admin/shortcut_add';
+			
+		} elseif ($param1 == 'list' ) {
+
+			$data['shortcut'] = $this->db->get('tbl_shortcuts')->result(); 
+
+			$data['title']        = 'Shortcut List';
+			$data['activeMenu']   = 'shortcut_list';			
+			$data['page']         = 'backEnd/admin/shortcut_list';
+		   
+		} elseif ($param1 == 'edit' && $param2 > 0) {
+
+			$data['edit_info']   = $this->db->get_where('tbl_shortcuts',array('id'=>$param2));
+
+			if ($data['edit_info']->num_rows() > 0) {
+
+				$data['edit_info']    = $data['edit_info']->row();
+
+				if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+					$update_shortcut['title']   = $this->input->post('title', true);
+					$update_shortcut['value']    = $this->input->post('value', true);		
+
+					if (!empty($_FILES['icon']['name'])) {
+
+						$path_parts                 = pathinfo($_FILES["icon"]['name']);
+						$newfile_name               = preg_replace('/[^A-Za-z]/', "", $path_parts['filename']);
+						$dir                        = date("YmdHis", time());
+						$config_c['file_name']      = $newfile_name . '_' . $dir;
+						$config_c['remove_spaces']  = TRUE;
+						$config_c['upload_path']    = 'assets/shortcutPhoto/';
+						$config_c['max_size']       = '20000'; //  less than 20 MB
+						$config_c['allowed_types']  = 'jpg|png|jpeg|jpg|JPG|JPG|PNG|JPEG';
+
+						$this->load->library('upload', $config_c);
+						$this->upload->initialize($config_c);
+						if (!$this->upload->do_upload('icon')) {
+
+						} else {
+
+							$upload_c = $this->upload->data();
+							$update_shortcut['icon'] = $config_c['upload_path'] . $upload_c['file_name'];
+							//$this->image_size_fix($update_shortcuts['photo'], 400, 400);
+						}
+						
+					}
+
+					if ($this->AdminModel->update_shortcuts($update_shortcut, $param2)) {
+
+						$this->session->set_flashdata('message','Shortcut  Updated Successfully!');
+						redirect('admin/shortcut/list','refresh');
+
+					} else {
+
+					   $this->session->set_flashdata('message','Shortcut Update Failed!');
+						redirect('admin/shortcut/list','refresh');
+					}
+				}
+
+			} else {
+
+				$this->session->set_flashdata('message','Wrong Attempt!');
+				redirect('admin/shortcut/list','refresh');
+			}
+
+			$data['title']      = 'Shortcut Edit';
+			$data['activeMenu'] = 'shortcut_edit';
+			$data['page']       = 'backEnd/admin/shortcut_edit';
+			
+		   
+		} elseif($param1 == 'delete' && $param2 > 0) {
+			
+		   if ($this->AdminModel->delete_shortcut($param2)) {
+
+				$this->session->set_flashdata('message','Shortcut Deleted Successfully!');
+				redirect('admin/shortcut/list','refresh');
+
+			} else {
+
+			   $this->session->set_flashdata('message','Shortcut Deleted Failed!');
+				redirect('admin/shortcut/list','refresh');
+			}
+			
+		} else {
+
+			$this->session->set_flashdata('message', 'Wrong Attempt!');
+			redirect('admin/shortcut/list','refresh');
 
 		}
 

@@ -331,6 +331,19 @@
                             </ul>
                         </li>
 
+                        <li class="treeview <?php if ($activeMenu === "shortcut_add" || $activeMenu === "shortcut_list" || $activeMenu === "shortcut_edit") echo "active"; ?> ">
+                            <a href="#">
+                                <i class="fa fa-tree"></i> <span> Shortcut </span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class=" <?php if ($activeMenu === "shortcut_add") echo "active"; ?> "><a href="<?php echo base_url('admin/shortcut/add'); ?>"><i class="fa fa-circle-o"></i> Shortcut Add </a></li>
+                                <li class=" <?php if ($activeMenu === "shortcut_list") echo "active"; ?> "><a href="<?php echo base_url('admin/shortcut/list'); ?>"><i class="fa fa-circle-o"></i> Shortcut List </a></li>
+                            </ul>
+                        </li>
+
                         <li class="treeview <?php if ($activeMenu === "messenger") echo "active"; ?> ">
                             <a href="<?php echo base_url('admin/messenger'); ?>">
                                 <i class="fa fa-comments"></i> <span> Messenger </span>
@@ -363,7 +376,7 @@
                             </ul>
                         </li>
 
-                        <li class="treeview hidden <?php if ($activeMenu === "testimonials_add" || $activeMenu === "testimonials_list" || $activeMenu === "testimonials_edit") echo "active"; ?> ">
+                        <li class="treeview <?php if ($activeMenu === "testimonials_add" || $activeMenu === "testimonials_list" || $activeMenu === "testimonials_edit") echo "active"; ?> ">
                             <a href="#">
                                 <i class="fa fa-star"></i> <span> <?php echo $this->lang->line('manage_testimonial'); ?> </span>
                                 <span class="pull-right-container">
