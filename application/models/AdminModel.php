@@ -397,23 +397,82 @@ class AdminModel extends CI_Model
 
 	public function get_testimonial_data()
 	{
-			$this->db->select('tbl_testimonial.*, tbl_student.student_name, tbl_student.student_roll')
-				->from('tbl_testimonial')			
-				->join('tbl_student', 'tbl_student.id = tbl_testimonial.student_id', 'left')			
-				->order_by('tbl_testimonial.priority', 'desc');
+		$this->db->select('tbl_testimonial.*, tbl_student.student_name, tbl_student.student_roll')
+			->from('tbl_testimonial')			
+			->join('tbl_student', 'tbl_student.id = tbl_testimonial.student_id', 'left')			
+			->order_by('tbl_testimonial.priority', 'desc');
 
-			$result = $this->db->get();
+		$result = $this->db->get();
 
-			if ($result->num_rows() > 0) {
+		if ($result->num_rows() > 0) {
 
-				return $result->result();
+			return $result->result();
+		} else {
+
+			return array();
+		}
+	}
+
+	public function purchase_course_list()
+    {
+        $this->db->select('tbl_purchase_course.*, tbl_student.student_name, tbl_student.student_roll')
+            ->from('tbl_purchase_course')
+            ->join('tbl_student', 'tbl_student.id = tbl_purchase_course.student_id', 'left')
+            ->order_by('tbl_purchase_course.purchase_date', 'desc');
+
+        $result = $this->db->get();
+
+        if ($result->num_rows() > 0) {
+
+            return $result->result();
+        } else {
+
+            return array();
+        }
+    }
+
+    public function get_purchase_course_data($id)
+    {
+        $this->db->select('tbl_purchase_details.*, tbl_courses.course_title, tbl_course_lecture.title, tbl_course_category.title as catrgory_title')
+            ->from('tbl_purchase_details')
+            ->join('tbl_courses', 'tbl_courses.id = tbl_purchase_details.course_id', 'left')
+            ->join('tbl_course_lecture', 'tbl_course_lecture.id = tbl_purchase_details.course_lecture_id', 'left')
+            ->join('tbl_course_category', 'tbl_course_category.id = tbl_courses.course_category_id', 'left')
+            ->where('tbl_purchase_details.purchase_course_id', $id);
+
+        $result = $this->db->get();
+
+        if ($result->num_rows() > 0) {
+
+            return $result->result();
+        } else {
+
+            return array();
+        }
+    }
+
+    public function get_purchase_info($id)
+    {
+        $this->db->select('tbl_purchase_course.*, tbl_student.student_name, tbl_student.student_roll, tbl_student.student_photo, tbl_student.student_phone')
+            ->from('tbl_purchase_course')
+            ->join('tbl_student', 'tbl_student.id = tbl_purchase_course.student_id', 'left')
+            ->where('tbl_purchase_course.id', $id);
+
+            $result = $this->db->get();
+	
+			if($result->num_rows() > 0){
+				
+				return $result->row();	
+
 			} else {
-
+	
 				return array();
 			}
-		}
+    }
 
 	}
+
+	
 
 ?>
 

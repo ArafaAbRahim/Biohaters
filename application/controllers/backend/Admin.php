@@ -1915,128 +1915,138 @@ class Admin extends CI_Controller {
 
 			if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-				$purchase_courses_data['course_id']        			= $this->input->post('course_id', true);
-				$purchase_courses_data['instructor_id']    			= $this->input->post('instructor_id', true);
-				$purchase_courses_data['purchase_course_section_id'] 	= $this->input->post('purchase_course_section_id', true);
-				$purchase_courses_data['title'] 						= $this->input->post('title', true);
-				$purchase_courses_data['sort_description'] 			= $this->input->post('sort_description', true);
-				$purchase_courses_data['lecture_price'] 				= $this->input->post('lecture_price', true);
-				$purchase_courses_data['lecture_discount'] 			= $this->input->post('lecture_discount', true);
-				$purchase_courses_data['video_server'] 				= $this->input->post('video_server', true);
-				$purchase_courses_data['video_link'] 				= $this->input->post('video_link', true);				
-				$purchase_courses_data['insert_time'] 				= date('Y-m-d H:i:s');
-				$purchase_courses_data['last_update'] 				= date('Y-m-d H:i:s');
-				$purchase_courses_data['keywords'] 					= "";
-
-				foreach($this->input->post('keywords',true) as $key => $single_keyword) {
-					if(strlen($single_keyword) > 1) {
-					  if($key > 0) $purchase_courses_data['keywords'] .=  "**";
-					  $purchase_courses_data['keywords'] .= $single_keyword;
-					}
-				}
+				$course_purchase_data = array();
+                $course_purchase_data['purchase_date']      = date('Y-m-d', strtotime($this->input->post('purchase_date', true)));               
+                $course_purchase_data['student_id']       	= $this->input->post('student_id', true);
+                $course_purchase_data['total_bill']   		= $this->input->post('total_bill', true);
+				$course_purchase_data['sub_total']      	= $this->input->post('sub_total', true);
 				
-				$add_purchase_courses = $this->db->insert('tbl_purchase_course',$purchase_courses_data);
+                if($this->input->post('is_discount', true)) {
+                    $course_purchase_data['is_discount']      	= 1; 
+                    $course_purchase_data['discount_amount']    = $this->input->post('discount_amount', true); 
+                    $course_purchase_data['discount_by']      	= $this->input->post('discount_by', true);
+    				$course_purchase_data['discount_details']	= $this->input->post('discount_details', true);
+                } 
+				
+				$course_purchase_data['aprrove_status']     = 1;
+                $course_purchase_data['approve_by']         = $_SESSION['userid'];  			                   			
+                $course_purchase_data['insert_time']        = date('Y-m-d H:i');
+                $course_purchase_data['insert_by']          = $_SESSION['userid'];
 
-				if ($add_purchase_courses) {
+                $purchase_course_data = $this->db->insert('tbl_purchase_course', $course_purchase_data);
+                $course_purchase_id = $this->db->insert_id();
 
-					$this->session->set_flashdata('message','Course Lecture Added Successfully!');
-					redirect('admin/purchase_course/list','refresh');
+				$purchase_data = array();                
+                $purchase_data['purchase_course_id']  	= $course_purchase_id;
+				$purchase_data['student_id']       		= $course_purchase_data['student_id'];
+                $purchase_data['insert_time']       	= $course_purchase_data['insert_time']; 
+                $purchase_data['insert_by']         	= $course_purchase_data['insert_by']; 
+                
+                foreach($this->input->post('course_id', true) as $key => $value) {
+                    
+                    if($value < 1) continue;  
+                    
+                    $purchase_data['course_id']         = $value; 
+                    $purchase_data['course_lecture_id']	= $this->input->post('course_lecture_id', true)[$key];
+                    $purchase_data['amount']     		= $this->input->post('amount', true)[$key];
+                    $purchase_data['discount']    		= $this->input->post('discount', true)[$key];
+                    $purchase_data['net_payable']       = $this->input->post('net_payable', true)[$key];
+					$purchase_data['discount_reason']   = 'auto discount';
+                    
+                    $this->db->insert('tbl_purchase_details', $purchase_data);
+
+                }
+
+				if ($purchase_course_data && true) {
+
+					$this->session->set_flashdata('message','Course Purchase Added Successfully!');
+					redirect('admin/purchase-course/list','refresh');
 
 				} else {
 
-				   $this->session->set_flashdata('message','Course Lecture Add Failed!');
-					redirect('admin/purchase_course/list','refresh');
+				   $this->session->set_flashdata('message','Course Purchase Add Failed!');
+					redirect('admin/purchase-course/list','refresh');
 				}
 			}
 
 			$data['category_list'] 	  		= $this->db->select('id, title')->get('tbl_course_category')->result();			
 
-			$data['title']             = 'Course Lecture Add';
+			$data['title']             = 'Course Purchase Add';
 			$data['activeMenu']        = 'purchase_course_add';
 			$data['page']              = 'backEnd/admin/purchase_course_add';
 			
-		} elseif ($param1 == 'list' ) {
+		}elseif($param1 == 'list' ) {
 
-			$data['purchase_courses_list'] = $this->AdminModel->get_purchase_course_data();
+			$data['purchase_courses_list'] = $this->AdminModel->purchase_course_list();
 
-			$data['title']        = 'Course Lecture List';
+			$data['title']        = 'Course Purchase List';
 			$data['activeMenu']   = 'purchase_course_list';			
 			$data['page']         = 'backEnd/admin/purchase_course_list';
 		   
-		} elseif ($param1 == 'edit' && $param2 > 0) {
+		}elseif($param1 == 'view' && (int) $param2 > 0) {
 
-			$data['edit_info']   = $this->db->get_where('tbl_purchase_course',array('id'=>$param2));
+			$data['purchase_courses_data'] = $this->AdminModel->get_purchase_course_data($param2);
 
-			if ($data['edit_info']->num_rows() > 0) {
-
-				$data['edit_info']    = $data['edit_info']->row();
-
-				if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-					$purchase_courses_data['course_id']        			= $this->input->post('course_id', true);
-					$purchase_courses_data['instructor_id']    			= $this->input->post('instructor_id', true);
-					$purchase_courses_data['purchase_course_section_id'] 	= $this->input->post('purchase_course_section_id', true);
-					$purchase_courses_data['title'] 						= $this->input->post('title', true);
-					$purchase_courses_data['sort_description'] 			= $this->input->post('sort_description', true);
-					$purchase_courses_data['lecture_price'] 				= $this->input->post('lecture_price', true);
-					$purchase_courses_data['lecture_discount'] 			= $this->input->post('lecture_discount', true);
-					$purchase_courses_data['video_server'] 				= $this->input->post('video_server', true);
-					$purchase_courses_data['video_link'] 				= $this->input->post('video_link', true);								
-					$purchase_courses_data['last_update'] 				= date('Y-m-d H:i:s');
-					$purchase_courses_data['keywords'] 					= "";
-
-					foreach($this->input->post('keywords',true) as $key => $single_keyword) {
-						if(strlen($single_keyword) > 1) {
-							if($key > 0) $purchase_courses_data['keywords'] .=  "**";
-							$purchase_courses_data['keywords'] .= $single_keyword;
-						}
-					}
-
-					$update_purchase_courses = $this->db->where('id',$param2)->update('tbl_purchase_course', $purchase_courses_data);
-
-					if ($update_purchase_courses) {
-
-						$this->session->set_flashdata('message','Course Lecture Updated Successfully!');
-						redirect('admin/purchase_course/list','refresh');
-
-					} else {
-
-					   $this->session->set_flashdata('message','Course Lecture Update Failed!');
-						redirect('admin/purchase_course/list','refresh');
-					}
-				}
-
-			} else {
-
-				$this->session->set_flashdata('message','Wrong Attempt!');
-				redirect('admin/purchase_course/list','refresh');
-			}
-
-			$data['course_data'] 	  		= $this->db->select('id, course_title')->get('tbl_courses')->result();
-			$data['instructor_data'] 		= $this->db->select('id, firstname, lastname')->where('userType', 'instructor')->get('user')->result();
-			$data['lecture_section_data'] 	= $this->db->select('id, section_name')->get('tbl_purchase_course_sections')->result();
-
-			$data['title']      = 'Course Lecture Edit';
-			$data['activeMenu'] = 'purchase_course_edit';
-			$data['page']       = 'backEnd/admin/purchase_course_edit';
 			
+            $data['purchase_info']  = $this->AdminModel->get_purchase_info($param2);
+
+
+			$data['title']        = 'Course Purchase View';
+			$data['activeMenu']   = 'purchase_course_view';			
+			$data['page']         = 'backEnd/admin/purchase_course_view';
 		   
-		} elseif($param1 == 'delete' && $param2 > 0) {
+		}elseif($param1 == 'delete' && $param2 > 0) {
 
 			$delete_purchase_course = $this->db->where('id',$param2)->delete('tbl_purchase_course');
 			
 		   if ($delete_purchase_course) {
 
-				$this->session->set_flashdata('message','Course Lecture  Deleted Successfully!');
+				$this->session->set_flashdata('message','Course Purchase  Deleted Successfully!');
 				redirect('admin/purchase_course/list','refresh');
 
 			} else {
 
-			   $this->session->set_flashdata('message','Course Lecture Deleted Failed!');
+			   $this->session->set_flashdata('message','Course Purchase Deleted Failed!');
 				redirect('admin/purchase_course/list','refresh');
 			}
 			
-		} else {
+		}elseif($param1 == 'accepted' && $param2 > 0) {
+
+			$check_purchase = $this->db->where('id', $param2)->get('tbl_purchase_course');
+			
+		    if ($check_purchase->num_rows() > 0) {
+		       
+		        $accepted['aprrove_status'] = 1;
+		        $this->db->where('id', $param2)->update('tbl_purchase_course', $accepted);
+
+				$this->session->set_flashdata('message','Course Purchase Accepted Successfully!');
+				redirect('admin/purchase-course/list','refresh');
+
+			} else {
+
+				$this->session->set_flashdata('message','Course Purchase Accepted Failed!');
+				redirect('admin/purchase-course/list','refresh');
+			}
+			
+		}elseif($param1 == 'reject' && $param2 > 0) {
+
+			$check_purchase = $this->db->where('id', $param2)->get('tbl_purchase_course');
+			
+		    if ($check_purchase->num_rows() > 0) {
+		       
+		        $approve['aprrove_status'] = 2;
+		        $this->db->where('id', $param2)->update('tbl_purchase_course', $approve);
+
+				$this->session->set_flashdata('message','Course Purchase reject Successfully!');
+				redirect('admin/purchase-course/list','refresh');
+
+			} else {
+
+				$this->session->set_flashdata('message','Course Purchase reject Failed!');
+				redirect('admin/purchase-course/list','refresh');
+			}
+			
+		}else {
 
 			$this->session->set_flashdata('message', 'Wrong Attempt!');
 			redirect('admin/purchase_course/list','refresh');
